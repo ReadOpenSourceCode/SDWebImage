@@ -7,7 +7,7 @@
  */
 
 #import <Foundation/Foundation.h>
-
+#import <UIKit/UIKit.h>
 @interface SDImageCache : NSObject
 {
     NSMutableDictionary *memCache;

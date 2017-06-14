@@ -7,7 +7,8 @@
  */
 
 #import "SDWebImageDownloader.h"
-
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 static NSOperationQueue *downloadQueue;
 
 @implementation SDWebImageDownloader
@@ -16,13 +17,12 @@ static NSOperationQueue *downloadQueue;
 
 - (void)dealloc
 {
-    [url release];
-    [super dealloc];
+
 }
 
 + (id)downloaderWithURL:(NSURL *)url delegate:(id<SDWebImageDownloaderDelegate>)delegate
 {
-    SDWebImageDownloader *downloader = [[[SDWebImageDownloader alloc] init] autorelease];
+    SDWebImageDownloader *downloader = [[SDWebImageDownloader alloc] init];
     downloader.url = url;
     downloader.delegate = delegate;
 
@@ -49,16 +49,14 @@ static NSOperationQueue *downloadQueue;
 
 - (void)main 
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
-    UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
-    
-    if (!self.isCancelled && [delegate respondsToSelector:@selector(imageDownloader:didFinishWithImage:)])
-    {
-        [delegate performSelector:@selector(imageDownloader:didFinishWithImage:) withObject:self withObject:image];
+    @autoreleasepool {
+        UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
+        
+        if (!self.isCancelled && [delegate respondsToSelector:@selector(imageDownloader:didFinishWithImage:)])
+        {
+            [delegate performSelector:@selector(imageDownloader:didFinishWithImage:) withObject:self withObject:image];
+        }
     }
-
-    [pool release];
 }
 
 @end

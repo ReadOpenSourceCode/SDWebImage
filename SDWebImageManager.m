@@ -28,11 +28,7 @@ static SDWebImageManager *instance;
 
 - (void) dealloc
 {
-    [delegates release];
-    [downloaders release];
-    [downloaderForURL release];
-    [failedURLs release];
-    [super dealloc];
+    
 }
 
 
@@ -78,6 +74,7 @@ static SDWebImageManager *instance;
 {
     @synchronized(self)
     {
+//        https://stackoverflow.com/questions/3167849/indexofobject-vs-indexofobjectidenticalto
         NSUInteger idx = [delegates indexOfObjectIdenticalTo:delegate];
 
         if (idx == NSNotFound)
@@ -85,7 +82,7 @@ static SDWebImageManager *instance;
             return;
         }
 
-        SDWebImageDownloader *downloader = [[downloaders objectAtIndex:idx] retain];
+        SDWebImageDownloader *downloader = [downloaders objectAtIndex:idx];
     
         [delegates removeObjectAtIndex:idx];
         [downloaders removeObjectAtIndex:idx];
@@ -97,13 +94,11 @@ static SDWebImageManager *instance;
             [downloaderForURL removeObjectForKey:downloader.url];
         }
 
-        [downloader release];
     }
 }
 
 - (void)imageDownloader:(SDWebImageDownloader *)downloader didFinishWithImage:(UIImage *)image
 {
-    [downloader retain];
 
     @synchronized(self)
     {
@@ -140,7 +135,6 @@ static SDWebImageManager *instance;
 
     // Release the downloader
     [downloaderForURL removeObjectForKey:downloader.url];
-    [downloader release];
 }
 
 

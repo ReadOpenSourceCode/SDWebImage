@@ -42,7 +42,9 @@
 
 - (void)webImageManager:(SDWebImageManager *)imageManager didFinishWithImage:(UIImage *)image
 {
-    self.image = image;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.image = image;
+    });
 }
 
 @end

@@ -8,6 +8,8 @@
 
 #import "SDImageCache.h"
 #import <CommonCrypto/CommonDigest.h>
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 static NSInteger cacheMaxCacheAge = 60*60*24*7; // 1 week
 
@@ -38,7 +40,7 @@ static SDImageCache *instance;
 
         // Init the disk cache
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        diskCachePath = [[[paths objectAtIndex:0] stringByAppendingPathComponent:@"ImageCache"] retain];
+        diskCachePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"ImageCache"];
         		
         if (![[NSFileManager defaultManager] fileExistsAtPath:diskCachePath])
         {
@@ -66,9 +68,6 @@ static SDImageCache *instance;
 
 - (void)dealloc
 {
-    [memCache release];
-    [diskCachePath release];
-    [cacheInQueue release];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIApplicationDidReceiveMemoryWarningNotification  
@@ -78,7 +77,6 @@ static SDImageCache *instance;
                                                     name:UIApplicationWillTerminateNotification  
                                                   object:nil];  
     
-    [super dealloc];
 }
 
 #pragma mark SDImageCache (class methods)
@@ -108,12 +106,11 @@ static SDImageCache *instance;
 
 - (void)storeKeyToDisk:(NSString *)key
 {
-    UIImage *image = [[self imageFromKey:key fromDisk:YES] retain]; // be thread safe with no lock
+    UIImage *image = [self imageFromKey:key fromDisk:YES]; // be thread safe with no lock
 
     if (image != nil)
     {
         [[NSFileManager defaultManager] createFileAtPath:[self cachePathForKey:key] contents:UIImageJPEGRepresentation(image, (CGFloat)1.0) attributes:nil];
-        [image release];
     }
 }
 
@@ -135,7 +132,7 @@ static SDImageCache *instance;
 
     if (toDisk)
     {        
-        [cacheInQueue addOperation:[[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(storeKeyToDisk:) object:key] autorelease]];
+        [cacheInQueue addOperation:[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(storeKeyToDisk:) object:key]];
     }
 }
 
@@ -159,7 +156,6 @@ static SDImageCache *instance;
         if (image != nil)
         {
             [memCache setObject:image forKey:key];
-            [image release];
         }
     }
 
